@@ -1,0 +1,2 @@
+# DonTheDDOSer
+Education purposes ONLY
