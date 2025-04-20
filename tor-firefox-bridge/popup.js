@@ -1,43 +1,66 @@
-document.addEventListener('DOMContentLoaded', async () => {
-  const statusDiv = document.getElementById('status');
-  const connectBtn = document.getElementById('connectBtn');
-  const disconnectBtn = document.getElementById('disconnectBtn');
+function showMessage(message, isSuccess = true) {
+  const msgBox = document.createElement("div");
+  msgBox.textContent = message;
+  msgBox.className = isSuccess ? "msg success" : "msg error";
+  document.body.appendChild(msgBox);
 
-  async function checkTor() {
-    try {
-      const response = await fetch("https://check.torproject.org", {cache: "no-store"});
-      const text = await response.text();
-      if (text.includes("Congratulations. This browser is configured to use Tor.")) {
-        statusDiv.innerText = "Tor is ACTIVE and in use.";
-      } else {
-        statusDiv.innerText = "Tor is running, but Firefox is NOT using it.";
-      }
-    } catch (error) {
-      statusDiv.innerText = "Tor connection not detected.";
-    }
+  setTimeout(() => {
+    msgBox.remove();
+  }, 4000);
+}
+
+function updateTorStatus(isTorActive) {
+  const statusElem = document.getElementById('tor-status');
+  if (isTorActive) {
+    statusElem.textContent = "✅ Tor network is active.";
+    statusElem.style.color = "lightgreen";
+  } else {
+    statusElem.textContent = "❌ Tor network is not active.";
+    statusElem.style.color = "red";
   }
+}
 
-  connectBtn.addEventListener('click', () => {
-    browser.proxy.settings.set({
-      value: {
-        proxyType: "manual",
-        socks: "127.0.0.1",
-        socksPort: 9050,
-        socksVersion: 5,
-        proxyDNS: true
-      }
+function checkTorStatus() {
+  fetch("https://check.torproject.org/")
+    .then(res => res.text())
+    .then(html => {
+      updateTorStatus(html.includes("Congratulations. This browser is configured to use Tor."));
+    })
+    .catch(() => {
+      updateTorStatus(false);
     });
-    statusDiv.innerText = "Tor proxy connected.";
-  });
+}
 
-  disconnectBtn.addEventListener('click', () => {
-    browser.proxy.settings.set({
+// Init: spustí sa hneď pri otvorení rozšírenia
+checkTorStatus();
+
+document.getElementById("connectBtn").addEventListener("click", () => {
+  chrome.proxy.settings.set(
+    {
       value: {
-        proxyType: "none"
-      }
-    });
-    statusDiv.innerText = "Tor proxy disconnected.";
-  });
+        mode: "fixed_servers",
+        rules: {
+          proxyForHttp: { scheme: "socks5", host: "127.0.0.1", port: 9050 },
+          proxyForHttps: { scheme: "socks5", host: "127.0.0.1", port: 9050 },
+          bypassList: ["localhost"]
+        }
+      },
+      scope: "regular"
+    },
+    () => {
+      showMessage("Firefox is now routed through Tor.", true);
+      setTimeout(() => {
+        checkTorStatus();  // 💡 Voláme znova kontrolu stavu po prepnutí proxy
+      }, 1500); // necháme Tor chvíľu prepnúť
+    }
+  );
+});
 
-  checkTor();
+document.getElementById("disconnectBtn").addEventListener("click", () => {
+  chrome.proxy.settings.clear({ scope: "regular" }, () => {
+    showMessage("Firefox is now disconnected from Tor.", false);
+    setTimeout(() => {
+      checkTorStatus(); // znova overíme, či sa vrátil do normálneho režimu
+    }, 1500);
+  });
 });
