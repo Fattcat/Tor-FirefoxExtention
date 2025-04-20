@@ -1,0 +1,58 @@
+body {
+  width: 240px;
+  font-family: sans-serif;
+  background-color: #1c1c1c;
+  color: #f1f1f1;
+  padding: 15px;
+  margin: 0;
+}
+
+h1 {
+  font-size: 16px;
+  margin-bottom: 10px;
+  color: #80dfff;
+}
+
+#tor-status {
+  margin-bottom: 15px;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #555;
+}
+
+/* Hlásenie */
+.msg {
+  padding: 8px;
+  margin-top: 10px;
+  text-align: center;
+  border-radius: 4px;
+  font-size: 13px;
+  animation: fade 4s forwards;
+}
+
+.success {
+  background-color: #225522;
+  color: #bbffbb;
+}
+
+.error {
+  background-color: #552222;
+  color: #ffbbbb;
+}
+
+@keyframes fade {
+  0% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
