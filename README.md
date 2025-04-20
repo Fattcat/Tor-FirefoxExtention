@@ -10,9 +10,7 @@
 - ├── manifest.json
 - ├── background.js
 - ├── popup.html
+- ├── styles.css
 - └── popup.js
-
-
-
 
 <h2 align="center">Supoort me with GitHub star</h2>
