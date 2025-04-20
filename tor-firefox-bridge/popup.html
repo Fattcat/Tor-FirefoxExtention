@@ -1,18 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <style>
-    body { font-family: sans-serif; width: 250px; }
-    button { margin-top: 10px; width: 100%; }
-    #status { margin: 10px 0; }
-  </style>
+  <meta charset="UTF-8" />
+  <title>Tor Bridge</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h3>Tor Firefox Bridge</h3>
-  <div id="status">Checking Tor status...</div>
+  <h1>Tor Bridge</h1>
+  <p id="tor-status">Checking Tor status...</p>
   <button id="connectBtn">Connect TOR network to Firefox</button>
   <button id="disconnectBtn">Disconnect TOR network from Firefox</button>
-
   <script src="popup.js"></script>
 </body>
 </html>
